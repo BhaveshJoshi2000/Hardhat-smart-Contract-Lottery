@@ -13,7 +13,11 @@ import "@chainlink/contracts/src/v0.8/KeeperCompatible.sol";
 error Not_Enough_Eth_To_Participate();
 error Raffle_TransferFailed();
 error Raffle__NotOpen();
-error Raffle_UpkeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 RaffleState);
+error Raffle_UpkeepNotNeeded(
+    uint256 currentBalance,
+    uint256 numPlayers,
+    uint256 RaffleState
+);
 
 /**@title A Lottery Project
  * @author Bhavesh Joshi
@@ -98,13 +102,16 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
         )
     {
         bool isOpen = (s_raffleState == RaffleState.OPEN);
-        bool timePassed = ((block.timestamp - s_previousTimestamp) > i_interval);
+        bool timePassed = ((block.timestamp - s_previousTimestamp) >
+            i_interval);
         bool hasEnoughPlayers = (s_players.length > 0);
         bool hasBalance = (address(this).balance > 0);
 
         upkeepNeeded = (isOpen && timePassed && hasEnoughPlayers && hasBalance);
     }
 
+    // overrides keepersCompatibleInterface
+    //runs only if checkupkeep returns true
     function performUpkeep(
         bytes calldata /* performData */
     ) external override {
