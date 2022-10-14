@@ -1,6 +1,5 @@
 const { ethers, network } = require("hardhat");
 const fs = require("fs");
-const { format } = require("path");
 
 const FRONT_END_ADDRESSES_FILE =
   "../Raffle-Frontend/constants/contractAddresses.json";
@@ -8,8 +7,8 @@ const FRONT_END_ABI_FILE = "../Raffle-Frontend/constants/abi.json";
 module.exports = async function () {
   if (process.env.UPDATE_FRONT_END) {
     console.log("updating frontend...");
-    updateContractAddresses();
-    updateAbi();
+    await updateAbi();
+    await updateContractAddresses();
   }
 };
 
@@ -22,16 +21,20 @@ async function updateAbi() {
 }
 async function updateContractAddresses() {
   const raffle = await ethers.getContract("Raffle");
+  console.log(raffle);
   const chainId = network.config.chainId.toString();
+  console.log(chainId);
   const currentAddresses = JSON.parse(
     fs.readFileSync(FRONT_END_ADDRESSES_FILE, "utf8")
   );
-
+  console.log(currentAddresses);
   if (chainId in currentAddresses) {
     if (!currentAddresses[chainId].includes(raffle.address)) {
+      console.log("updating contract address");
       currentAddresses[chainId].push(raffle.address);
     }
   } else {
+    console.log("adding new address...");
     currentAddresses[chainId] = [raffle.address];
   }
 
